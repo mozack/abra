@@ -14,8 +14,8 @@ extern "C" {
 #undef abra_NativeAssembler_MIN_CANDIDATE_BASE_QUALITY
 #define abra_NativeAssembler_MIN_CANDIDATE_BASE_QUALITY 10L
 /*
- * Class:     abra_NativeAssembler
- * Method:    assemble
+ * Class:	 abra_NativeAssembler
+ * Method:	assemble
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIIIIDII)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_abra_NativeAssembler_assemble

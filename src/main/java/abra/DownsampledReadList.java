@@ -13,7 +13,7 @@ import htsjdk.samtools.SAMRecord;
  * Downsamples reads on the fly.  Useful for when depth gets too high.
  */
 public class DownsampledReadList {
-	
+
 	private Random random = new Random(1);
 	private List<SAMRecord> reads = new ArrayList<SAMRecord>();
 	private int maxReads;
@@ -22,7 +22,7 @@ public class DownsampledReadList {
 	public DownsampledReadList(int maxReads) {
 		this.maxReads = maxReads;
 	}
-	
+
 	public void add(SAMRecord read) {
 		totalReads += 1;
 		if (reads.size() < maxReads) {
@@ -34,11 +34,11 @@ public class DownsampledReadList {
 			}
 		}
 	}
-	
+
 	public List<SAMRecord> getReads() {
 		return reads;
 	}
-	
+
 	public int getTotalReadCount() {
 		return totalReads;
 	}

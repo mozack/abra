@@ -3,7 +3,7 @@ package abra;
 
 /**
  * Main entry point for Abra.
- * 
+ *
  * @author Lisle E. Mose (lmose at unc dot edu)
  */
 public class Abra {

@@ -11,11 +11,11 @@ import htsjdk.samtools.SAMRecord;
 
 /**
  * Thread runnable class for read adjustment.
- * 
+ *
  * @author Lisle E. Mose (lmose at unc dot edu)
  */
 public class AdjustReadsQueueRunnable extends AbraRunnable {
-	
+
 	private ReadAdjuster readAdjuster;
 	private SAMFileWriter outputSam;
 	private boolean isTightAlignment;
@@ -40,11 +40,11 @@ public class AdjustReadsQueueRunnable extends AbraRunnable {
 	public void go() throws Exception {
 		readAdjuster.adjustReads(queue, outputSam, isTightAlignment, tempDir, samHeader, isDone);
 	}
-	
+
 	public void setReadQueue(Queue<SAMRecord> queue) {
 		this.queue = queue;
 	}
-	
+
 	public void setDone() {
 		isDone.setValue(true);
 	}

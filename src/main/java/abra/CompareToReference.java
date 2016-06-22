@@ -15,7 +15,7 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.ValidationStringency;
 
 public class CompareToReference {
-	
+
 	private StringBuffer reference;
 	private String refFileName;
 	private String currSeqName = "";
@@ -24,63 +24,63 @@ public class CompareToReference {
 
 	public void compare(String sam, String refFileName, int maxDiff) throws IOException, FileNotFoundException {
 		refReader = new BufferedReader(new FileReader(refFileName));
-		
+
 		SAMFileReader reader = new SAMFileReader(new File(sam));
 		reader.setValidationStringency(ValidationStringency.SILENT);
-		
+
 		int count = 0;
 		int totalMapped = 0;
-		
+
 		for (SAMRecord read : reader) {
 			if (!read.getReadUnmappedFlag()) {
 				String seq = read.getReferenceName();
 				if (!seq.equals(currSeqName)) {
 					loadSeqRef(seq);
 				}
-				
+
 //				String refStr = reference.substring(read.getAlignmentStart()-1, read.getAlignmentStart()+99);
 //				if (!refStr.equals(read.getReadString())) {
 //				StringBuffer diffStr = new StringBuffer();
 				if (numDifferences(read) > maxDiff) {
-					System.out.println("------------");
-					System.out.println("read: " + read.getSAMString());
-//					System.out.println("ref: " + refStr);
-//					System.out.println("dif: " + diffStr.toString());
+					System.err.println("------------");
+					System.err.println("read: " + read.getSAMString());
+//					System.err.println("ref: " + refStr);
+//					System.err.println("dif: " + diffStr.toString());
 					count += 1;
 				}
-				
+
 				totalMapped += 1;
 			}
 		}
-		
-		System.out.println("count: " + count + " out of: " + totalMapped);
-		
+
+		System.err.println("count: " + count + " out of: " + totalMapped);
+
 		reader.close();
 	}
-	
+
 	public void init(String reference) throws FileNotFoundException {
 		refReader = new BufferedReader(new FileReader(reference));
 	}
-	
+
 	public void cleanup() throws IOException {
 		refReader.close();
 	}
-	
+
 	public int numMismatches(SAMRecord read) throws IOException {
 		int mismatches = 0;
-		
+
 		if (!read.getReadUnmappedFlag()) {
 			String seq = read.getReferenceName();
 			if (!seq.equals(currSeqName)) {
 				loadSeqRef(seq);
 			}
-			
+
 			mismatches = numDifferences(read);
 		}
 
 		return mismatches;
 	}
-	
+
 	private int numDifferences(SAMRecord read) {
 		int diffs = 0;
 		int readIdx = 0;
@@ -93,7 +93,7 @@ public class CompareToReference {
 					if ((readBase != refBase) && (readBase != 'N') && (refBase != 'N')) {
 						diffs++;
 					}
-					
+
 					readIdx++;
 					refIdx++;
 				}
@@ -116,27 +116,27 @@ public class CompareToReference {
 //			} else {
 //				desc.append(' ');
 //			}
-//			
+//
 //			i +=1;
 //		}
-		
+
 		return diffs;
 	}
-	
+
 	private void loadSeqRef(String seq) throws IOException {
-		System.out.println("Loading: " + seq);
-		
+		System.err.println("Loading: " + seq);
+
 		this.currSeqName = seq;
 		String line = getRefLine();
-		
+
 		while ((line != null) && (!line.equals(">" + seq))) {
 			line = getRefLine();
 		}
-		
+
 		if (line != null) {
 			line = getRefLine();
 		}
-		
+
 		reference = new StringBuffer();
 		while ((line != null) && (!line.startsWith(">"))) {
 			reference.append(line);
@@ -145,10 +145,10 @@ public class CompareToReference {
 				cachedRefLine = line;
 			}
 		}
-		
-		System.out.println("Loaded: " + seq);
+
+		System.err.println("Loaded: " + seq);
 	}
-	
+
 	private String getRefLine() throws IOException {
 		String line = null;
 		if (cachedRefLine != null) {
@@ -157,16 +157,16 @@ public class CompareToReference {
 		} else {
 			line = refReader.readLine();
 		}
-		
+
 		return line;
 	}
-	
+
 	public static void main(String[] args) throws Exception {
-		
+
 		String ref = args[0];
 		String sam = args[1];
 		int max = Integer.parseInt(args[2]);
-		
+
 //		String ref = "/home/lmose/reference/chr16/chr16.fa";
 //		String sam = "/home/lmose/dev/ayc/sim/sim80/sorted_rr4.bam";
 //		String sam = "/home/lmose/dev/ayc/sim/sim80/sorted_rr.bam";

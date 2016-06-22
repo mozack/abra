@@ -7,7 +7,7 @@ import abra.AbraRunnable;
 import abra.ThreadManager;
 
 public class RnaRegionHandler extends AbraRunnable {
-	
+
 	private RnaPoc poc;
 	private List<SAMRecord> reads;
 	private String id;
@@ -22,10 +22,10 @@ public class RnaRegionHandler extends AbraRunnable {
 		// Calculating this requires iterating over entire region.
 		id = "thread: " + first.getReferenceName() + "_" + first.getAlignmentStart() + "_" + last.getAlignmentEnd() + " reads: " + reads.size();
 	}
-	
+
 	@Override
 	public void go() throws Exception {
-		System.out.println("Thread spawned for " + id);
+		System.err.println("Thread spawned for " + id);
 		poc.processReads(reads);
 	}
 }

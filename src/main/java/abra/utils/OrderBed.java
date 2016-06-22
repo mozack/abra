@@ -13,50 +13,50 @@ import abra.Feature;
 /**
  * Orders the input bed file by start and stop position.  Chromosome ordering is preserved.
  * Can be used to correct ordering for use in KmerSizeEvaluator.
- * 
+ *
  * @author lmose
  */
 public class OrderBed {
-	
+
 	public static void orderBed(String bedFile) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(bedFile));
-		
+
 		try {
-			
+
 			String lastChr = "";
-			
+
 			String line = reader.readLine();
-			
+
 			List<Feature> features = new ArrayList<Feature>();
-			
+
 			while (line != null) {
 				if(line.startsWith("#")) {
 					line = reader.readLine();
 					continue;
 				}
 				String[] fields = line.split("\t");
-				
+
 				String chromosome = fields[0];
 				long startPos = Long.valueOf(fields[1]);
 				long endPos = Long.valueOf(fields[2]);
-				
+
 				if (startPos > endPos) {
 					throw new IllegalArgumentException("Region end must be greater than or equal to region start in target BED file: " + line);
 				}
-				
+
 				Feature region = new Feature(chromosome, startPos, endPos);
-				
+
 				if (!chromosome.equals(lastChr)) {
 					// Sort and output the current chromosome's features
 					outputFeatures(features);
 					lastChr = chromosome;
 				}
-				
+
 				features.add(region);
-				
+
 				line = reader.readLine();
 			}
-			
+
 			// Output last chromosome
 			outputFeatures(features);
 		} finally {
@@ -67,11 +67,11 @@ public class OrderBed {
 	private static void outputFeatures(List<Feature> features) {
 		Collections.sort(features, new FeatureComparator());
 		for (Feature feature : features) {
-			System.out.println(feature.getSeqname() + "\t" + feature.getStart() + "\t" + feature.getEnd());
+			System.err.println(feature.getSeqname() + "\t" + feature.getStart() + "\t" + feature.getEnd());
 		}
 		features.clear();
 	}
-	
+
 	private static class FeatureComparator implements Comparator<Feature> {
 
 		@Override
@@ -80,7 +80,7 @@ public class OrderBed {
 				throw new IllegalArgumentException(
 						"Can't compare regions from different chromosomes: " + o1 + "," + o2);
 			}
-			
+
 			if (o1.getStart() < o2.getStart()) {
 				return -1;
 			} else if (o1.getStart() > o2.getStart()) {
@@ -95,12 +95,12 @@ public class OrderBed {
 		}
 
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		System.err.println("Starting bed ordering.");
 		String bedFile = args[0];
 		orderBed(bedFile);
 		System.err.println("Bed ordering done.");
-		
+
 	}
 }

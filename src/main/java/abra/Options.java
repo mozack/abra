@@ -8,45 +8,45 @@ import joptsimple.OptionSet;
 
 /**
  * Abstract base class for helping with options parsing.
- * 
+ *
  * @author Lisle E. Mose (lmose at unc dot edu)
  */
 public abstract class Options {
 	protected static final String HELP = "help";
-	
+
 	private OptionSet options;
 
-    protected void printHelp() {
-        try {
-        	getOptionParser().printHelpOn(System.err);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("IOException encountered when attempting to output help.");
-        }
-    }
-    
-    public void parseOptions(String[] args) {
+	protected void printHelp() {
+		try {
+			getOptionParser().printHelpOn(System.err);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("IOException encountered when attempting to output help.");
+		}
+	}
 
-        try {
-            options = getOptionParser().parse(args);
-        
-            if (options.has(HELP)) {
-                printHelp();
-            } else {
-                validate();
-            }
-        } catch (joptsimple.OptionException e) {
-            System.err.println(e.getMessage());
-            printHelp();
-        }
-    }
-    
-    protected OptionSet getOptions() {
-    	return options;
-    }
+	public void parseOptions(String[] args) {
 
-    abstract protected OptionParser getOptionParser();
-    
-    abstract protected void validate();
+		try {
+			options = getOptionParser().parse(args);
+
+			if (options.has(HELP)) {
+				printHelp();
+			} else {
+				validate();
+			}
+		} catch (joptsimple.OptionException e) {
+			System.err.println(e.getMessage());
+			printHelp();
+		}
+	}
+
+	protected OptionSet getOptions() {
+		return options;
+	}
+
+	abstract protected OptionParser getOptionParser();
+
+	abstract protected void validate();
 }

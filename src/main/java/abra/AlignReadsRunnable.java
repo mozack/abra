@@ -7,12 +7,12 @@ import htsjdk.samtools.SAMFileWriter;
 
 /**
  * Thread entry point for read alignment.
- * 
+ *
  * @author Lisle E. Mose (lmose at unc dot edu)
  */
 @Deprecated
 public class AlignReadsRunnable extends AbraRunnable {
-		
+
 	private String tempDir;
 	private String inputSam;
 	private String cleanContigsFasta;
@@ -20,7 +20,7 @@ public class AlignReadsRunnable extends AbraRunnable {
 	private SAMFileWriter finalOutputSam;
 	private String alignedToContigSam;
 	private ReAligner reAligner;
-	
+
 	public AlignReadsRunnable(ThreadManager threadManager, ReAligner realigner, String tempDir, String inputSam, String cleanContigsFasta,
 			CompareToReference2 c2r, SAMFileWriter finalOutputSam, String alignedToContigSam) {
 
