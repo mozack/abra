@@ -10,13 +10,13 @@ public class SVReadCounterRunnable implements Runnable {
 	private SAMFileHeader header;
 	private SamReader reader;
 	private SVReadCounter counter;
-	
+
 	public SVReadCounterRunnable(SamReader reader, int readLength, SAMFileHeader header) {
 		this.readLength = readLength;
 		this.header = header;
 		this.reader = reader;
 	}
-	
+
 	@Override
 	public void run() {
 		counter = new SVReadCounter();

@@ -20,11 +20,11 @@ public class IndelInfo {
 	public int getReadIndex() {
 		return readIndex;
 	}
-	
+
 	public void setReadIndex(int readIndex) {
 		this.readIndex = readIndex;
 	}
-	
+
 	public String getInsertBases() {
 		return insertBases;
 	}

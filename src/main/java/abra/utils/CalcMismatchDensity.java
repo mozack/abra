@@ -24,7 +24,7 @@ public class CalcMismatchDensity {
 	private CompareToReference3 c2r;
 	private int minBaseQuality = 20;
 	private int readLength;
-	
+
 	public CalcMismatchDensity(String ref, String baseDir, String inputFile, String origBam, String abraBam, int readLength) {
 		this.ref = ref;
 		this.baseDir = baseDir;
@@ -33,21 +33,21 @@ public class CalcMismatchDensity {
 		this.abraBam = abraBam;
 		this.readLength = readLength;
 	}
-	
+
 	public void run() throws IOException {
-		
+
 		System.err.println("Loading reference");
 		c2r = new CompareToReference3();
 		c2r.init(ref);
 		c2r.setMinBaseQuality(20);
-		
+
 		BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-		
+
 		SAMFileReader abraReader = null;
 		SAMFileReader origReader = null;
-		
+
 		long s = System.currentTimeMillis();
-		
+
 		String line = reader.readLine();
 		while (line != null) {
 			String[] fields = line.split("\t");
@@ -58,14 +58,14 @@ public class CalcMismatchDensity {
 				abraReader = initReader(abraReader, baseDir + "/" + pid + "/" + abraBam);
 				origReader = initReader(origReader, baseDir + "/" + pid + "/" + origBam);
 			}
-			
+
 			String chromosome = fields[2];
 			int pos = Integer.parseInt(fields[3]);
 			int refLen = Integer.parseInt(fields[5]);
 			int altLen = Integer.parseInt(fields[6]);
 			int length = 0;
 			CigarOperator indelType;
-			
+
 			if (refLen > 1) {
 				indelType = CigarOperator.D;
 				length = refLen - 1;
@@ -75,37 +75,37 @@ public class CalcMismatchDensity {
 			} else {
 				throw new IllegalArgumentException("Not an indel: " + line);
 			}
-			
+
 			double abraMd = calcMismatchDensity(abraReader, indelType, chromosome, pos, length);
 			double origMd = calcMismatchDensity(origReader, indelType, chromosome, pos, length);
-			
-			System.out.println(line + "\t" + abraMd + "\t" + origMd);
-			
+
+			System.err.println(line + "\t" + abraMd + "\t" + origMd);
+
 			line = reader.readLine();
 		}
-		
+
 		reader.close();
-		
+
 		long e = System.currentTimeMillis();
-		
-//		System.out.println("Elapsed: " + (e-s));
+
+//		System.err.println("Elapsed: " + (e-s));
 	}
-	
+
 	private double calcMismatchDensity(SAMFileReader reader, CigarOperator indelType, String chromosome, int pos, int length) {
-		
+
 		int numMismatches = 0;
 		int numBases = 0;
-		
+
 		CloseableIterator<SAMRecord> iter =  reader.queryOverlapping(chromosome, pos-readLength, pos+length+readLength);
 
 		while (iter.hasNext()) {
 			SAMRecord read = (SAMRecord) iter.next();
-			
+
 //			String yo = (String) read.getAttribute("YO");
 
 //			if ((yo == null) || (!yo.equals("N/A"))) {
 				numMismatches += c2r.noiseAroundIndel(read, indelType, pos, length);
-				
+
 				for (int qual : read.getBaseQualities()) {
 	//				qual = qual - '!';
 					if (qual >= minBaseQuality) {
@@ -116,21 +116,21 @@ public class CalcMismatchDensity {
 		}
 
 		iter.close();
-		
+
 		return numBases == 0 ? 0.0 : (double) numMismatches / (double) numBases;
 	}
-	
+
 	private SAMFileReader initReader(SAMFileReader old, String input) {
 		if (old != null) {
 			old.close();
 		}
-		
+
 		SAMFileReader reader = new SAMFileReader(new File(input));
 		reader.setValidationStringency(ValidationStringency.SILENT);
 
 		return reader;
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		String ref = args[0];
 		String baseDir = args[1];
@@ -145,11 +145,11 @@ public class CalcMismatchDensity {
 //		String origBam = "n1.bam";
 //		String abraBam = "n.abra.1.bam";
 //		int readLength = 100;
-		
+
 		CalcMismatchDensity cmd = new CalcMismatchDensity(ref, baseDir, inputFile, origBam, abraBam, readLength);
-		
+
 		cmd.run();
-		
+
 		System.err.println("Done.");
 	}
 }

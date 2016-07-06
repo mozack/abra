@@ -1,6 +1,6 @@
 /*
  * NOTE: This file is for internal use only.
- *       Do not use these #defines in your own program!
+ *	   Do not use these #defines in your own program!
  */
 
 /* Namespace for Google classes */

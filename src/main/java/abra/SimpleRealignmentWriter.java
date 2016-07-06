@@ -6,7 +6,7 @@ import htsjdk.samtools.SAMRecord;
 
 /**
  * Simple realignment writer.  Does not consider read pair information when writing to output BAM.
- * 
+ *
  * @author Lisle E. Mose (lmose at unc dot edu)
  */
 public class SimpleRealignmentWriter implements RealignmentWriter {
@@ -16,16 +16,16 @@ public class SimpleRealignmentWriter implements RealignmentWriter {
 	private IndelShifter indelShifter = new IndelShifter();
 	private boolean isTightAlignment = false;
 	private CompareToReference2 c2r;
-	
+
 	public SimpleRealignmentWriter(CompareToReference2 c2r, SAMFileWriter writer, boolean isTightAlignment) {
 		this.writer = writer;
 		this.c2r = c2r;
 		this.isTightAlignment = isTightAlignment;
 	}
-	
+
 	@Override
 	public void addAlignment(SAMRecord updatedRead, SAMRecord origRead) {
-		
+
 		if (updatedRead != null) {
 			// Output realigned read
 			addAlignment(updatedRead);
@@ -38,7 +38,7 @@ public class SimpleRealignmentWriter implements RealignmentWriter {
 			addAlignment(origRead);
 		}
 	}
-	
+
 	private void addAlignment(SAMRecord read) {
 		writer.addAlignment(read);
 //		if (isTightAlignment) {

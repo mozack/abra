@@ -19,8 +19,8 @@ public class MapqEval {
 		List<Feature> regions = loader.load(bed, false);
 
 		int[] thresholds = new int[] { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 255 };
-		
-		
+
+
 		for (Feature region : regions) {
 			SAMFileReader reader = new SAMFileReader(new File(input));
 			reader.setValidationStringency(ValidationStringency.SILENT);
@@ -38,20 +38,20 @@ public class MapqEval {
 					}
 				}
 			}
-			
+
 			StringBuffer output = new StringBuffer();
 			output.append(region.getDescriptor());
-			
+
 			for (int count : counts) {
 				output.append('\t');
 				output.append(count);
 			}
-			
-			System.out.println(output.toString());
+
+			System.err.println(output.toString());
 			reader.close();
 		}
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		new MapqEval().eval(args[0], args[1]);
 	}

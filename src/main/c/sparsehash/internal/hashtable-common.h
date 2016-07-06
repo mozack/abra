@@ -5,13 +5,13 @@
 // modification, are permitted provided that the following conditions are
 // met:
 //
-//     * Redistributions of source code must retain the above copyright
+//	 * Redistributions of source code must retain the above copyright
 // notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
+//	 * Redistributions in binary form must reproduce the above
 // copyright notice, this list of conditions and the following disclaimer
 // in the documentation and/or other materials provided with the
 // distribution.
-//     * Neither the name of Google Inc. nor the names of its
+//	 * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
 // this software without specific prior written permission.
 //
@@ -43,9 +43,9 @@
 #include <sparsehash/internal/sparseconfig.h>
 #include <assert.h>
 #include <stdio.h>
-#include <stddef.h>                  // for size_t
+#include <stddef.h>				  // for size_t
 #include <iosfwd>
-#include <stdexcept>                 // For length_error
+#include <stdexcept>				 // For length_error
 
 _START_GOOGLE_NAMESPACE_
 
@@ -67,8 +67,8 @@ namespace sparsehash_internal {
 // normal type information.  (We only use the second version.)  We do
 // this because of how C++ picks what function overload to use.  If we
 // implemented this the naive way:
-//    bool read_data(istream* is, const void* data, size_t length);
-//    template<typename T> read_data(T* fp,  const void* data, size_t length);
+//	bool read_data(istream* is, const void* data, size_t length);
+//	template<typename T> read_data(T* fp,  const void* data, size_t length);
 // C++ would prefer the second version for every stream type except
 // istream.  However, we want C++ to prefer the first version for
 // streams that are *subclasses* of istream, such as istringstream.
@@ -85,13 +85,13 @@ namespace sparsehash_internal {
 
 template<typename Ignored>
 inline bool read_data_internal(Ignored*, FILE* fp,
-                               void* data, size_t length) {
+							   void* data, size_t length) {
   return fread(data, length, 1, fp) == 1;
 }
 
 template<typename Ignored>
 inline bool write_data_internal(Ignored*, FILE* fp,
-                                const void* data, size_t length) {
+								const void* data, size_t length) {
   return fwrite(data, length, 1, fp) == 1;
 }
 
@@ -103,23 +103,23 @@ inline bool write_data_internal(Ignored*, FILE* fp,
 // the istream/ostream is a template type.  So we jump through hoops.
 template<typename ISTREAM>
 inline bool read_data_internal_for_istream(ISTREAM* fp,
-                                           void* data, size_t length) {
+										   void* data, size_t length) {
   return fp->read(reinterpret_cast<char*>(data), length).good();
 }
 template<typename Ignored>
 inline bool read_data_internal(Ignored*, std::istream* fp,
-                               void* data, size_t length) {
+							   void* data, size_t length) {
   return read_data_internal_for_istream(fp, data, length);
 }
 
 template<typename OSTREAM>
 inline bool write_data_internal_for_ostream(OSTREAM* fp,
-                                            const void* data, size_t length) {
+											const void* data, size_t length) {
   return fp->write(reinterpret_cast<const char*>(data), length).good();
 }
 template<typename Ignored>
 inline bool write_data_internal(Ignored*, std::ostream* fp,
-                                const void* data, size_t length) {
+								const void* data, size_t length) {
   return write_data_internal_for_ostream(fp, data, length);
 }
 
@@ -129,7 +129,7 @@ inline bool write_data_internal(Ignored*, std::ostream* fp,
 // buffer and a length and returns the number of bytes read.
 template <typename INPUT>
 inline bool read_data_internal(INPUT* fp, void*,
-                               void* data, size_t length) {
+							   void* data, size_t length) {
   return static_cast<size_t>(fp->Read(data, length)) == length;
 }
 
@@ -137,7 +137,7 @@ inline bool read_data_internal(INPUT* fp, void*,
 // a buffer and a length and returns the number of bytes written.
 template <typename OUTPUT>
 inline bool write_data_internal(OUTPUT* fp, void*,
-                                const void* data, size_t length) {
+								const void* data, size_t length) {
   return static_cast<size_t>(fp->Write(data, length)) == length;
 }
 
@@ -164,10 +164,10 @@ bool read_bigendian_number(INPUT* fp, IntType* value, size_t length) {
   unsigned char byte;
   // We require IntType to be unsigned or else the shifting gets all screwy.
   SPARSEHASH_COMPILE_ASSERT(static_cast<IntType>(-1) > static_cast<IntType>(0),
-                            serializing_int_requires_an_unsigned_type);
+							serializing_int_requires_an_unsigned_type);
   for (size_t i = 0; i < length; ++i) {
-    if (!read_data(fp, &byte, sizeof(byte))) return false;
-    *value |= static_cast<IntType>(byte) << ((length - 1 - i) * 8);
+	if (!read_data(fp, &byte, sizeof(byte))) return false;
+	*value |= static_cast<IntType>(byte) << ((length - 1 - i) * 8);
   }
   return true;
 }
@@ -177,11 +177,11 @@ bool write_bigendian_number(OUTPUT* fp, IntType value, size_t length) {
   unsigned char byte;
   // We require IntType to be unsigned or else the shifting gets all screwy.
   SPARSEHASH_COMPILE_ASSERT(static_cast<IntType>(-1) > static_cast<IntType>(0),
-                            serializing_int_requires_an_unsigned_type);
+							serializing_int_requires_an_unsigned_type);
   for (size_t i = 0; i < length; ++i) {
-    byte = (sizeof(value) <= length-1 - i)
-        ? 0 : static_cast<unsigned char>((value >> ((length-1 - i) * 8)) & 255);
-    if (!write_data(fp, &byte, sizeof(byte))) return false;
+	byte = (sizeof(value) <= length-1 - i)
+		? 0 : static_cast<unsigned char>((value >> ((length-1 - i) * 8)) & 255);
+	if (!write_data(fp, &byte, sizeof(byte))) return false;
   }
   return true;
 }
@@ -194,12 +194,12 @@ bool write_bigendian_number(OUTPUT* fp, IntType value, size_t length) {
 template <typename value_type> struct pod_serializer {
   template <typename INPUT>
   bool operator()(INPUT* fp, value_type* value) const {
-    return read_data(fp, value, sizeof(*value));
+	return read_data(fp, value, sizeof(*value));
   }
 
   template <typename OUTPUT>
   bool operator()(OUTPUT* fp, const value_type& value) const {
-    return write_data(fp, &value, sizeof(value));
+	return write_data(fp, &value, sizeof(value));
   }
 };
 
@@ -217,7 +217,7 @@ template <typename value_type> struct pod_serializer {
 // is needless work (and possibly, though not likely, harmful).
 
 template<typename Key, typename HashFunc,
-         typename SizeType, int HT_MIN_BUCKETS>
+		 typename SizeType, int HT_MIN_BUCKETS>
 class sh_hashtable_settings : public HashFunc {
  public:
   typedef Key key_type;
@@ -226,148 +226,148 @@ class sh_hashtable_settings : public HashFunc {
 
  public:
   sh_hashtable_settings(const hasher& hf,
-                        const float ht_occupancy_flt,
-                        const float ht_empty_flt)
-      : hasher(hf),
-        enlarge_threshold_(0),
-        shrink_threshold_(0),
-        consider_shrink_(false),
-        use_empty_(false),
-        use_deleted_(false),
-        num_ht_copies_(0) {
-    set_enlarge_factor(ht_occupancy_flt);
-    set_shrink_factor(ht_empty_flt);
+						const float ht_occupancy_flt,
+						const float ht_empty_flt)
+	  : hasher(hf),
+		enlarge_threshold_(0),
+		shrink_threshold_(0),
+		consider_shrink_(false),
+		use_empty_(false),
+		use_deleted_(false),
+		num_ht_copies_(0) {
+	set_enlarge_factor(ht_occupancy_flt);
+	set_shrink_factor(ht_empty_flt);
   }
 
   size_type hash(const key_type& v) const {
-    // We munge the hash value when we don't trust hasher::operator().
-    return hash_munger<Key>::MungedHash(hasher::operator()(v));
+	// We munge the hash value when we don't trust hasher::operator().
+	return hash_munger<Key>::MungedHash(hasher::operator()(v));
   }
 
   float enlarge_factor() const {
-    return enlarge_factor_;
+	return enlarge_factor_;
   }
   void set_enlarge_factor(float f) {
-    enlarge_factor_ = f;
+	enlarge_factor_ = f;
   }
   float shrink_factor() const {
-    return shrink_factor_;
+	return shrink_factor_;
   }
   void set_shrink_factor(float f) {
-    shrink_factor_ = f;
+	shrink_factor_ = f;
   }
 
   size_type enlarge_threshold() const {
-    return enlarge_threshold_;
+	return enlarge_threshold_;
   }
   void set_enlarge_threshold(size_type t) {
-    enlarge_threshold_ = t;
+	enlarge_threshold_ = t;
   }
   size_type shrink_threshold() const {
-    return shrink_threshold_;
+	return shrink_threshold_;
   }
   void set_shrink_threshold(size_type t) {
-    shrink_threshold_ = t;
+	shrink_threshold_ = t;
   }
 
   size_type enlarge_size(size_type x) const {
-    return static_cast<size_type>(x * enlarge_factor_);
+	return static_cast<size_type>(x * enlarge_factor_);
   }
   size_type shrink_size(size_type x) const {
-    return static_cast<size_type>(x * shrink_factor_);
+	return static_cast<size_type>(x * shrink_factor_);
   }
 
   bool consider_shrink() const {
-    return consider_shrink_;
+	return consider_shrink_;
   }
   void set_consider_shrink(bool t) {
-    consider_shrink_ = t;
+	consider_shrink_ = t;
   }
 
   bool use_empty() const {
-    return use_empty_;
+	return use_empty_;
   }
   void set_use_empty(bool t) {
-    use_empty_ = t;
+	use_empty_ = t;
   }
 
   bool use_deleted() const {
-    return use_deleted_;
+	return use_deleted_;
   }
   void set_use_deleted(bool t) {
-    use_deleted_ = t;
+	use_deleted_ = t;
   }
 
   size_type num_ht_copies() const {
-    return static_cast<size_type>(num_ht_copies_);
+	return static_cast<size_type>(num_ht_copies_);
   }
   void inc_num_ht_copies() {
-    ++num_ht_copies_;
+	++num_ht_copies_;
   }
 
   // Reset the enlarge and shrink thresholds
   void reset_thresholds(size_type num_buckets) {
-    set_enlarge_threshold(enlarge_size(num_buckets));
-    set_shrink_threshold(shrink_size(num_buckets));
-    // whatever caused us to reset already considered
-    set_consider_shrink(false);
+	set_enlarge_threshold(enlarge_size(num_buckets));
+	set_shrink_threshold(shrink_size(num_buckets));
+	// whatever caused us to reset already considered
+	set_consider_shrink(false);
   }
 
   // Caller is resposible for calling reset_threshold right after
   // set_resizing_parameters.
   void set_resizing_parameters(float shrink, float grow) {
-    assert(shrink >= 0.0);
-    assert(grow <= 1.0);
-    if (shrink > grow/2.0f)
-      shrink = grow / 2.0f;     // otherwise we thrash hashtable size
-    set_shrink_factor(shrink);
-    set_enlarge_factor(grow);
+	assert(shrink >= 0.0);
+	assert(grow <= 1.0);
+	if (shrink > grow/2.0f)
+	  shrink = grow / 2.0f;	 // otherwise we thrash hashtable size
+	set_shrink_factor(shrink);
+	set_enlarge_factor(grow);
   }
 
   // This is the smallest size a hashtable can be without being too crowded
   // If you like, you can give a min #buckets as well as a min #elts
   size_type min_buckets(size_type num_elts, size_type min_buckets_wanted) {
-    float enlarge = enlarge_factor();
-    size_type sz = HT_MIN_BUCKETS;             // min buckets allowed
-    while ( sz < min_buckets_wanted ||
-            num_elts >= static_cast<size_type>(sz * enlarge) ) {
-      // This just prevents overflowing size_type, since sz can exceed
-      // max_size() here.
-      if (static_cast<size_type>(sz * 2) < sz) {
-        throw std::length_error("resize overflow");  // protect against overflow
-      }
-      sz *= 2;
-    }
-    return sz;
+	float enlarge = enlarge_factor();
+	size_type sz = HT_MIN_BUCKETS;			 // min buckets allowed
+	while ( sz < min_buckets_wanted ||
+			num_elts >= static_cast<size_type>(sz * enlarge) ) {
+	  // This just prevents overflowing size_type, since sz can exceed
+	  // max_size() here.
+	  if (static_cast<size_type>(sz * 2) < sz) {
+		throw std::length_error("resize overflow");  // protect against overflow
+	  }
+	  sz *= 2;
+	}
+	return sz;
   }
 
  private:
   template<class HashKey> class hash_munger {
    public:
-    static size_t MungedHash(size_t hash) {
-      return hash;
-    }
+	static size_t MungedHash(size_t hash) {
+	  return hash;
+	}
   };
   // This matches when the hashtable key is a pointer.
   template<class HashKey> class hash_munger<HashKey*> {
    public:
-    static size_t MungedHash(size_t hash) {
-      // TODO(csilvers): consider rotating instead:
-      //    static const int shift = (sizeof(void *) == 4) ? 2 : 3;
-      //    return (hash << (sizeof(hash) * 8) - shift)) | (hash >> shift);
-      // This matters if we ever change sparse/dense_hash_* to compare
-      // hashes before comparing actual values.  It's speedy on x86.
-      return hash / sizeof(void*);   // get rid of known-0 bits
-    }
+	static size_t MungedHash(size_t hash) {
+	  // TODO(csilvers): consider rotating instead:
+	  //	static const int shift = (sizeof(void *) == 4) ? 2 : 3;
+	  //	return (hash << (sizeof(hash) * 8) - shift)) | (hash >> shift);
+	  // This matters if we ever change sparse/dense_hash_* to compare
+	  // hashes before comparing actual values.  It's speedy on x86.
+	  return hash / sizeof(void*);   // get rid of known-0 bits
+	}
   };
 
   size_type enlarge_threshold_;  // table.size() * enlarge_factor
   size_type shrink_threshold_;   // table.size() * shrink_factor
-  float enlarge_factor_;         // how full before resize
-  float shrink_factor_;          // how empty before resize
+  float enlarge_factor_;		 // how full before resize
+  float shrink_factor_;		  // how empty before resize
   // consider_shrink=true if we should try to shrink before next insert
   bool consider_shrink_;
-  bool use_empty_;    // used only by densehashtable, not sparsehashtable
+  bool use_empty_;	// used only by densehashtable, not sparsehashtable
   bool use_deleted_;  // false until delkey has been set
   // num_ht_copies is a counter incremented every Copy/Move
   unsigned int num_ht_copies_;

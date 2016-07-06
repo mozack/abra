@@ -21,7 +21,7 @@ public class AssemblerSettings {
 	private double minEdgeRatio;
 	private boolean isDebug;
 	private int maxNodes;
-		
+
 	public int getMaxNodes() {
 		return maxNodes;
 	}
@@ -81,54 +81,54 @@ public class AssemblerSettings {
 	public int[] getKmerSize() {
 		return kmerSize;
 	}
-	
+
 	public void setKmerSize(int[] kmerSize) {
 		this.kmerSize = kmerSize;
 	}
-	
+
 	public void setMinUnalignedNodeFrequency(int minUnalignedNodeFrequency) {
 		this.minUnalignedNodeFrequency = minUnalignedNodeFrequency;
 	}
-	
+
 	public int getMinUnalignedNodeFrequency() {
 		return minUnalignedNodeFrequency;
 	}
-	
+
 	public int getMinNodeFrequncy() {
 		return minNodeFrequncy;
 	}
-	
+
 	public void setMinNodeFrequncy(int minNodeFrequncy) {
 		this.minNodeFrequncy = minNodeFrequncy;
 	}
-	
+
 	public int getMinContigLength() {
 		return minContigLength;
 	}
-	
+
 	public void setMinContigLength(int minContigLength) {
 		this.minContigLength = minContigLength;
 	}
-	
+
 	public int getMaxPotentialContigs() {
 		return maxPotentialContigs;
 	}
-	
+
 	public void setMaxPotentialContigs(int maxPotentialContigs) {
 		this.maxPotentialContigs = maxPotentialContigs;
 	}
-	
+
 	public boolean isDebug() {
 		return this.isDebug;
 	}
-	
+
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
 	}
-		
+
 	public String getDescription() {
 		StringBuffer str = new StringBuffer();
-		
+
 		for (int i=0; i<kmerSize.length; i++) {
 			appendSetting(str, "kmer" + i, kmerSize[i]);
 		}
@@ -140,17 +140,17 @@ public class AssemblerSettings {
 		appendSetting(str, "minReadCandidateFraction", minReadCandidateFraction);
 		appendSetting(str, "maxAverageRegionDepth", maxAverageDepth);
 		appendSetting(str, "minEdgeRatio", minEdgeRatio);
-		
+
 		return str.toString();
 	}
-	
+
 	private void appendSetting(StringBuffer str, String setting, int value) {
 		str.append(setting);
 		str.append(": ");
 		str.append(value);
 		str.append('\n');
 	}
-	
+
 	private void appendSetting(StringBuffer str, String setting, double value) {
 		str.append(setting);
 		str.append(": ");

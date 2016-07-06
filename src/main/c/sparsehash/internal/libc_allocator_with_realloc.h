@@ -5,13 +5,13 @@
 // modification, are permitted provided that the following conditions are
 // met:
 //
-//     * Redistributions of source code must retain the above copyright
+//	 * Redistributions of source code must retain the above copyright
 // notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
+//	 * Redistributions in binary form must reproduce the above
 // copyright notice, this list of conditions and the following disclaimer
 // in the documentation and/or other materials provided with the
 // distribution.
-//     * Neither the name of Google Inc. nor the names of its
+//	 * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
 // this software without specific prior written permission.
 //
@@ -33,9 +33,9 @@
 #define UTIL_GTL_LIBC_ALLOCATOR_WITH_REALLOC_H_
 
 #include <sparsehash/internal/sparseconfig.h>
-#include <stdlib.h>           // for malloc/realloc/free
-#include <stddef.h>           // for ptrdiff_t
-#include <new>                // for placement new
+#include <stdlib.h>		   // for malloc/realloc/free
+#include <stddef.h>		   // for ptrdiff_t
+#include <new>				// for placement new
 
 _START_GOOGLE_NAMESPACE_
 
@@ -59,21 +59,21 @@ class libc_allocator_with_realloc {
   const_pointer address(const_reference r) const  { return &r; }
 
   pointer allocate(size_type n, const_pointer = 0) {
-    return static_cast<pointer>(malloc(n * sizeof(value_type)));
+	return static_cast<pointer>(malloc(n * sizeof(value_type)));
   }
   void deallocate(pointer p, size_type) {
-    free(p);
+	free(p);
   }
   pointer reallocate(pointer p, size_type n) {
-    return static_cast<pointer>(realloc(p, n * sizeof(value_type)));
+	return static_cast<pointer>(realloc(p, n * sizeof(value_type)));
   }
 
   size_type max_size() const  {
-    return static_cast<size_type>(-1) / sizeof(value_type);
+	return static_cast<size_type>(-1) / sizeof(value_type);
   }
 
   void construct(pointer p, const value_type& val) {
-    new(p) value_type(val);
+	new(p) value_type(val);
   }
   void destroy(pointer p) { p->~value_type(); }
 
@@ -82,7 +82,7 @@ class libc_allocator_with_realloc {
 
   template<class U>
   struct rebind {
-    typedef libc_allocator_with_realloc<U> other;
+	typedef libc_allocator_with_realloc<U> other;
   };
 };
 
@@ -98,19 +98,19 @@ class libc_allocator_with_realloc<void> {
 
   template<class U>
   struct rebind {
-    typedef libc_allocator_with_realloc<U> other;
+	typedef libc_allocator_with_realloc<U> other;
   };
 };
 
 template<class T>
 inline bool operator==(const libc_allocator_with_realloc<T>&,
-                       const libc_allocator_with_realloc<T>&) {
+					   const libc_allocator_with_realloc<T>&) {
   return true;
 }
 
 template<class T>
 inline bool operator!=(const libc_allocator_with_realloc<T>&,
-                       const libc_allocator_with_realloc<T>&) {
+					   const libc_allocator_with_realloc<T>&) {
   return false;
 }
 

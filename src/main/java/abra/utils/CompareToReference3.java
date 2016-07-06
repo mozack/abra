@@ -19,70 +19,70 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.ValidationStringency;
 
 public class CompareToReference3 {
-	
+
 	private String refFileName;
 	private String currSeqName = "";
 	private String cachedRefLine = null;
 	private BufferedReader refReader;
 	private Map<String, byte[]> refMap;
 	private int minBaseQuality = Integer.MIN_VALUE;
-	
+
 /*
 	public void compare(String sam, String refFileName, int maxDiff) throws IOException, FileNotFoundException {
 		loadRefMap();
-		
+
 		SAMFileReader reader = new SAMFileReader(new File(sam));
 		reader.setValidationStringency(ValidationStringency.SILENT);
-		
+
 		int count = 0;
 		int totalMapped = 0;
-		
+
 		for (SAMRecord read : reader) {
 			if (!read.getReadUnmappedFlag()) {
-				
+
 				if (numDifferences(read) > maxDiff) {
-					System.out.println("------------");
-					System.out.println("read: " + read.getSAMString());
+					System.err.println("------------");
+					System.err.println("read: " + read.getSAMString());
 					count += 1;
 				}
-				
+
 				totalMapped += 1;
 			}
 		}
-		
-		System.out.println("count: " + count + " out of: " + totalMapped);
-		
+
+		System.err.println("count: " + count + " out of: " + totalMapped);
+
 		reader.close();
 	}
 	*/
-	
+
 	public void init(String reference) throws FileNotFoundException, IOException {
 		this.refFileName = reference;
 		loadRefMap();
 	}
-	
+
 	public void cleanup() throws IOException {
 		refReader.close();
 	}
-		
+
 	public List<Integer> mismatchPositions(SAMRecord read) {
 		return mismatchPositions(read, -1);
 	}
-	
+
 	public String getAlternateReference(SAMRecord read, Cigar cigar) {
 		String alt = null;
-		
+
 		byte[] reference = refMap.get(read.getReferenceName().trim());
-		
+
 		if (read.getAlignmentEnd() < reference.length) {
-			
+
 			StringBuffer altBuf = new StringBuffer(read.getReadLength());
-		
+
 			int readIdx = 0;
 			int refIdx = read.getAlignmentStart()-1;
 			for (CigarElement element : cigar.getCigarElements()) {
 				if (element.getOperator() == CigarOperator.M) {
-					
+
 					for (int i=0; i<element.getLength(); i++) {
 
 						if (refIdx >= reference.length) {
@@ -90,11 +90,11 @@ public class CompareToReference3 {
 							// This read has aligned across chromosomes.  Do not proceed.
 							return null;
 						}
-						
+
 						char refBase  = Character.toUpperCase((char) reference[refIdx]);
-						
+
 						altBuf.append(refBase);
-											
+
 						readIdx++;
 						refIdx++;
 					}
@@ -107,22 +107,22 @@ public class CompareToReference3 {
 					readIdx += element.getLength();
 				}
 			}
-			
+
 			alt = altBuf.toString();
 		}
-		
+
 		return alt;
 	}
-	
+
 	public List<Integer> mismatchPositions(SAMRecord read, int maxMismatches) {
 		if (read.getReadUnmappedFlag()) {
 			return Collections.emptyList();
 		}
-		
+
 		List<Integer> mismatches = new ArrayList<Integer>();
-		
+
 		byte[] reference = refMap.get(read.getReferenceName().trim());
-		
+
 		int readIdx = 0;
 		int refIdx = read.getAlignmentStart()-1;
 		for (CigarElement element : read.getCigar().getCigarElements()) {
@@ -135,7 +135,7 @@ public class CompareToReference3 {
 					if ((readBase != refBase) && (readBase != 'N') && (refBase != 'N')) {
 						mismatches.add(readIdx);
 					}
-					
+
 					readIdx++;
 					refIdx++;
 				}
@@ -146,7 +146,7 @@ public class CompareToReference3 {
 			} else if (element.getOperator() == CigarOperator.S) {
 				readIdx += element.getLength();
 			}
-			
+
 			if ((maxMismatches > 0) && (mismatches.size() > maxMismatches)) {
 				break;
 			}
@@ -154,18 +154,18 @@ public class CompareToReference3 {
 
 		return mismatches;
 	}
-	
+
 	private char getReadBase(SAMRecord read, int index) {
 		//return Character.toUpperCase(read.getReadString().charAt(index));
 		return (char) read.getReadBases()[index];
 	}
-	
+
 	private int getReadBaseQuality(SAMRecord read, int index) {
 		return read.getBaseQualities()[index];
 	}
-	
+
 	public int noiseAroundIndel(SAMRecord read, CigarOperator indelType, int indelPos, int indelLength) {
-		
+
 		int diffs = 0;
 		byte[] reference = refMap.get(read.getReferenceName().trim());
 		if (reference != null) {
@@ -176,16 +176,16 @@ public class CompareToReference3 {
 				if (element.getOperator() == CigarOperator.M) {
 					for (int i=0; i<element.getLength(); i++) {
 						int readBaseQuality = getReadBaseQuality(read, readIdx);
-						
+
 						if (readBaseQuality >= minBaseQuality) {
-						
+
 							char readBase = getReadBase(read, readIdx);
 							char refBase  = Character.toUpperCase((char) reference[refIdx]);
 							if ((readBase != refBase) && (readBase != 'N') && (refBase != 'N')) {
 								diffs++;
 							}
 						}
-						
+
 						readIdx++;
 						refIdx++;
 					}
@@ -201,20 +201,20 @@ public class CompareToReference3 {
 					refIdx += element.getLength();
 				} else if (element.getOperator() == CigarOperator.S) {
 //					readIdx += element.getLength();
-					
+
 					if (elementIdx == 0) {
 						refIdx -= element.getLength();
 					}
-					
+
 					//TODO: Should this always be included?
 					for (int i=0; i<element.getLength(); i++) {
 						int readBaseQuality = getReadBaseQuality(read, readIdx);
-						
+
 						if (readBaseQuality >= minBaseQuality) {
-						
+
 							if ((refIdx >= 0) && (refIdx < reference.length-1)) {
 	//							char readBase = Character.toUpperCase(read.getReadString().charAt(readIdx));
-								
+
 								char readBase = getReadBase(read, readIdx);
 								char refBase  = Character.toUpperCase((char) reference[refIdx]);
 								if ((readBase != refBase) && (readBase != 'N') && (refBase != 'N')) {
@@ -224,19 +224,19 @@ public class CompareToReference3 {
 								diffs++;
 							}
 						}
-						
+
 						readIdx++;
 						refIdx++;
 					}
 				}
-				
+
 				elementIdx++;
 			}
 		}
-		
+
 		return diffs;
 	}
-	
+
 	private byte[] getBytes(StringBuffer buf) {
 		byte[] bytes = new byte[buf.length()];
 		for (int i=0; i<buf.length(); i++) {
@@ -244,14 +244,14 @@ public class CompareToReference3 {
 		}
 		return bytes;
 	}
-	
+
 	private void loadRefMap() throws IOException {
 		System.err.println("Loading reference map:  " + this.refFileName);
 		long s = System.currentTimeMillis();
 		this.refMap = new HashMap<String, byte[]>();
-		
+
 		BufferedReader reader = new BufferedReader(new FileReader(refFileName));
-		
+
 		String line = reader.readLine();
 		StringBuffer sequence = new StringBuffer();
 		String currSeqName = null;
@@ -260,9 +260,9 @@ public class CompareToReference3 {
 				if (currSeqName != null) {
 					refMap.put(currSeqName, getBytes(sequence));
 				}
-				
+
 				sequence = new StringBuffer();
-				
+
 				currSeqName = line.substring(1, line.length()).trim();
 				int spaceIdx = currSeqName.indexOf(' ');
 				if (spaceIdx > 0) {
@@ -272,29 +272,29 @@ public class CompareToReference3 {
 				if (tabIdx > 0) {
 					currSeqName = currSeqName.substring(0, tabIdx);
 				}
-				
+
 			} else {
 				line.toUpperCase();
 				sequence.append(line);
 			}
-			
+
 			line = reader.readLine();
 		}
-		
+
 		refMap.put(currSeqName, getBytes(sequence));
-		
+
 		sequence = null;
-		
+
 		reader.close();
-		
+
 		long e = System.currentTimeMillis();
 		System.err.println("Done loading ref map.  Elapsed secs: " + (e-s)/1000);
 	}
-	
+
 	public void setMinBaseQuality(int minBaseQuality) {
 		this.minBaseQuality = minBaseQuality;
 	}
-		
+
 	private String getRefLine() throws IOException {
 		String line = null;
 		if (cachedRefLine != null) {
@@ -303,49 +303,49 @@ public class CompareToReference3 {
 		} else {
 			line = refReader.readLine();
 		}
-		
+
 		return line;
 	}
-	
+
 	/*
 	public static void main(String[] args) {
 		String foo = "ATCGNatcgn";
-		System.out.println(foo);
+		System.err.println(foo);
 		byte[] bytes = foo.getBytes();
-		System.out.println("num bytes: " + bytes.length);
+		System.err.println("num bytes: " + bytes.length);
 		for (int i=0; i<bytes.length; i++) {
-			System.out.println("b: " + bytes[i] + "-" + ((char) bytes[i]));
+			System.err.println("b: " + bytes[i] + "-" + ((char) bytes[i]));
 		}
-		
+
 	}
 	*/
-	
+
 	/*
 	public static void main(String[] args) throws Exception {
-		
+
 //		String ref = args[0];
 //		String sam = args[1];
-		
+
 //		String ref = "/home/lmose/reference/chr7/chr7.fa";
 //		String sam = "/home/lmose/dev/ayc/24/26/test";
-		
+
 		String ref = "/home/lmose/reference/chr1/1.fa";
 		String sam = "/home/lmose/dev/abra_wxs/4/ttest1.bam";
 
-		
+
 		CompareToReference3 c2r = new CompareToReference3();
 		c2r.init(ref);
-		
+
 //		Thread.sleep(100000);
-		
+
 		SAMFileReader rdr = new SAMFileReader(new File(sam));
-		
+
 		for (SAMRecord read : rdr) {
 			int mismatches = c2r.numMismatches(read);
-			
-			System.out.println("mismatches: " + mismatches);
+
+			System.err.println("mismatches: " + mismatches);
 		}
-		
+
 		rdr.close();
 	}
 	*/

@@ -72,14 +72,14 @@ uint64_t MurmurHash64A ( const void * key, int len, uint64_t seed )
 
   while(data != end)
   {
-    uint64_t k = *data++;
+	uint64_t k = *data++;
 
-    k *= m;
-    k ^= k >> r;
-    k *= m;
+	k *= m;
+	k ^= k >> r;
+	k *= m;
 
-    h ^= k;
-    h *= m;
+	h ^= k;
+	h *= m;
   }
 
   const unsigned char * data2 = (const unsigned char*)data;
@@ -93,7 +93,7 @@ uint64_t MurmurHash64A ( const void * key, int len, uint64_t seed )
   case 3: h ^= uint64_t(data2[2]) << 16;
   case 2: h ^= uint64_t(data2[1]) << 8;
   case 1: h ^= uint64_t(data2[0]);
-          h *= m;
+		  h *= m;
   };
 
   h ^= h >> r;
@@ -108,7 +108,7 @@ struct eqstr
 {
   bool operator()(const char* s1, const char* s2) const
   {
-    return (s1 == s2) || (s1 && s2 && strncmp(s1, s2, kmer_size) == 0);
+	return (s1 == s2) || (s1 && s2 && strncmp(s1, s2, kmer_size) == 0);
   }
 };
 
@@ -693,30 +693,30 @@ void prune_graph(sparse_hash_map<const char*, struct node*, my_hash, eqstr>* nod
 }
 
 void print_kmer(struct node* node) {
-    for (int i=0; i<kmer_size; i++) {
-            printf("%c", node->kmer[i]);
-    }
+	for (int i=0; i<kmer_size; i++) {
+			printf("%c", node->kmer[i]);
+	}
 }
 
 void print_node(struct node* node) {
-        printf("kmer: ");
-        print_kmer(node);
-        printf("\tfrom: ");
+		printf("kmer: ");
+		print_kmer(node);
+		printf("\tfrom: ");
 
-        struct linked_node* from = node->fromNodes;
-        while (from != NULL) {
-        	print_kmer(from->node);
-        	printf(",");
-        	from = from->next;
-        }
+		struct linked_node* from = node->fromNodes;
+		while (from != NULL) {
+			print_kmer(from->node);
+			printf(",");
+			from = from->next;
+		}
 
-        printf("\tto: ");
-        struct linked_node* to = node->toNodes;
-        while (to != NULL) {
-        	print_kmer(to->node);
-        	printf(",");
-        	to = to->next;
-        }
+		printf("\tto: ");
+		struct linked_node* to = node->toNodes;
+		while (to != NULL) {
+			print_kmer(to->node);
+			printf(",");
+			to = to->next;
+		}
 }
 
 int is_root(struct node* node) {
@@ -745,7 +745,7 @@ struct linked_node* identify_root_nodes(sparse_hash_map<const char*, struct node
 	int count = 0;
 
 	for (sparse_hash_map<const char*, struct node*, my_hash, eqstr>::const_iterator it = nodes->begin();
-	         it != nodes->end(); ++it) {
+			 it != nodes->end(); ++it) {
 		struct node* node = it->second;
 
 //		if (node != NULL) {
@@ -982,7 +982,7 @@ void cleanup(sparse_hash_map<const char*, struct node*, my_hash, eqstr>* nodes, 
 
 	// Free linked lists
 	for (sparse_hash_map<const char*, struct node*, my_hash, eqstr>::const_iterator it = nodes->begin();
-	         it != nodes->end(); ++it) {
+			 it != nodes->end(); ++it) {
 		struct node* node = it->second;
 
 		if (node != NULL) {
@@ -1129,13 +1129,13 @@ char* assemble(const char* input,
 extern "C"
  JNIEXPORT jstring JNICALL Java_abra_NativeAssembler_assemble
    (JNIEnv *env, jobject obj, jstring j_input, jstring j_output, jstring j_prefix,
-    jint j_truncate_on_output, jint j_max_contigs, jint j_max_paths_from_root,
-    jint j_read_length, jint j_kmer_size, jint j_min_node_freq, jint j_min_base_quality,
-    jdouble j_min_edge_ratio, jint j_debug, jint j_max_nodes)
+	jint j_truncate_on_output, jint j_max_contigs, jint j_max_paths_from_root,
+	jint j_read_length, jint j_kmer_size, jint j_min_node_freq, jint j_min_base_quality,
+	jdouble j_min_edge_ratio, jint j_debug, jint j_max_nodes)
  {
 
-     //Get the native string from javaString
-     //const char *nativeString = env->GetStringUTFChars(javaString, 0);
+	 //Get the native string from javaString
+	 //const char *nativeString = env->GetStringUTFChars(javaString, 0);
 	const char* input  = env->GetStringUTFChars(j_input, 0);
 	const char* output = env->GetStringUTFChars(j_output, 0);
 	const char* prefix = env->GetStringUTFChars(j_prefix, 0);
@@ -1170,37 +1170,37 @@ extern "C"
 	char* contig_str = assemble(input, output, prefix, truncate_on_output, max_contigs, max_paths_from_root, read_length, kmer_size);
 	jstring ret = env->NewStringUTF(contig_str);
 
-     //DON'T FORGET THIS LINE!!!
-    env->ReleaseStringUTFChars(j_input, input);
-    env->ReleaseStringUTFChars(j_output, output);
-    env->ReleaseStringUTFChars(j_prefix, prefix);
-    free(contig_str);
+	 //DON'T FORGET THIS LINE!!!
+	env->ReleaseStringUTFChars(j_input, input);
+	env->ReleaseStringUTFChars(j_output, output);
+	env->ReleaseStringUTFChars(j_prefix, prefix);
+	free(contig_str);
 
-    fflush(stdout);
+	fflush(stdout);
 
-    return ret;
+	return ret;
  }
 
 int main(int argc, char* argv[]) {
 
 
-        min_node_freq = 2;
-        min_base_quality = 5;
-        min_edge_ratio = .05;
+		min_node_freq = 2;
+		min_base_quality = 5;
+		min_edge_ratio = .05;
 
-        assemble(
-//                "/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/mtest.reads",
-//                "/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/mtest.fa",
-//                "/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/ftest.reads",
-//                "/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/ftest.fa",
+		assemble(
+//				"/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/mtest.reads",
+//				"/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/mtest.fa",
+//				"/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/ftest.reads",
+//				"/datastore/nextgenout4/seqware-analysis/lmose/platinum/test/ftest.fa",
 		"/datastore/nextgenout4/seqware-analysis/lmose/platinum/long_d/test1.reads",
 		"/datastore/nextgenout4/seqware-analysis/lmose/platinum/long_d/test1.fa",
-                "foo",
-                false,
-                500000,
-                5000,
-                101,
-                53);
+				"foo",
+				false,
+				500000,
+				5000,
+				101,
+				53);
 
 
 /*
