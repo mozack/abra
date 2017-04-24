@@ -2,6 +2,8 @@
 
 Manuscript: https://doi.org/10.1093/bioinformatics/btu376
 
+Active development has now moved to: [ABRA2](https://github.com/mozack/abra2)
+
 ## Introduction
 
 ABRA is a realigner for next generation sequencing data.  It uses localized assembly and global realignment to align reads more accurately, thus improving downstream analysis (detection of indels and complex variants in particular).
